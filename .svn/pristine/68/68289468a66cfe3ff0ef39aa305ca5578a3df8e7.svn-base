@@ -1,0 +1,77 @@
+package com.chen_hewen.fileexplorer;
+
+import java.io.File;
+
+import android.os.Environment;
+
+public class FileHelper {
+	
+	private String mSDPath;
+	private String mFileName;
+	private String mCurPath;
+	
+	public String withSlashBefore(String str){
+		return "/" + str;
+	}
+	
+	//判断SD卡是否存在
+	public boolean isSDCardExist(){
+		return Environment.getExternalStorageState()
+				.equals(Environment.MEDIA_MOUNTED);
+	} 
+	
+	//获取SD卡根路径
+	public String getSDCardRootPath(){
+		if(!isSDCardExist()){
+			return null;
+		}
+		mSDPath = Environment.getExternalStorageDirectory().toString();
+		return mSDPath;
+	}
+	
+	//获取指定路径下的文件夹和文件
+	public File[] getDirsAndFiles(String path){
+		File file = new File(path);
+		File[] files =  file.listFiles();
+		return files;
+	}
+	
+	//进入文件，同时更新当前路径！
+	public File[] openDir(String path){
+		if(mSDPath == null){
+			getSDCardRootPath();
+		}
+		mCurPath = mSDPath + withSlashBefore(path);
+		return getDirsAndFiles(path);
+	}
+	
+	//获取当前路径
+	public String getCurPath(){
+		return mCurPath;
+	}
+	
+	//退出文件时，同步问价路径
+	public String correctCurPath(){
+		mCurPath.substring(0, mCurPath.lastIndexOf("/"));
+		return mCurPath;
+	}
+	
+	//进入文件时，同步文件路径
+	public String correctCurPath(String path){
+		return mCurPath + withSlashBefore(path);
+	}
+	
+	//在指定路径新建文件夹
+	public boolean createDir(String path){
+		File file = new File(path);
+		if(file.isDirectory()){
+			return false;
+		}
+		return file.mkdir();
+	}
+	
+	public boolean createDirInCurPath(String path){
+		return createDir(mCurPath + path);
+	}
+	
+}

@@ -1,0 +1,73 @@
+package com.chen_hewen.fileexplorer;
+
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+
+public class DownloadItem {
+	private int imageId;
+	private String name;
+	private String urlStr;
+	private State state = State.UNSTART;
+	private String path;
+	
+	public enum State{
+		UNSTART,
+		BUSY,
+		PAUSE,
+		OVER
+	}
+	
+	public DownloadItem(int imageId, String path, String name, String urlStr){
+		this.imageId = imageId;
+		this.path = path;
+		this.name = name;
+		this.urlStr = urlStr;
+	}
+	
+	
+	public String getUrlStr() {
+		return urlStr;
+	}
+
+	public void setUrlStr(String urlStr) {
+		this.urlStr = urlStr;
+	}
+
+
+	public int getImageId() {
+		return imageId;
+	}
+
+	public void setImageId(int mImageId) {
+		this.imageId = mImageId;
+	}
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String mName) {
+		this.name = mName;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+
+	public String getPath() {
+		return path;
+	}
+
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	
+}

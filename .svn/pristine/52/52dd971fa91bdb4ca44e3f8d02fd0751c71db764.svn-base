@@ -1,0 +1,125 @@
+package com.chen_hewen.fileexplorer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+
+import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+public class DownloadAdapter extends BaseAdapter{
+
+	List mData;
+	Context mContext;
+	int mProgress;
+	List<ViewHolder> mHolders;
+	
+	
+	public DownloadAdapter(Context context){
+		mContext = context;
+		mData = new ArrayList<DownloadItem>();
+		mHolders = new ArrayList<ViewHolder>();
+	}
+	
+	public void addData(List data){
+		mData = data;
+	}
+	
+	@Override
+	public int getCount() {
+		return mData.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return mData.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	static class ViewHolder{
+		ImageView image;
+		TextView name;
+		ProgressBar bar;
+		Button button;
+	}
+	
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		
+		ViewHolder holder = null;
+		
+		if(convertView == null){
+			holder = new ViewHolder();
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.download_list_item, null);
+			holder.image = (ImageView) convertView.findViewById(R.id.download_fileicon);
+			holder.name = (TextView) convertView.findViewById(R.id.download_filename);
+			holder.button = (Button) convertView.findViewById(R.id.download_btn);
+			holder.bar = (ProgressBar) convertView.findViewById(R.id.download_bar);
+			holder.button.setOnClickListener(new BtnListener(position));
+			mHolders.add(holder);
+			convertView.setTag(holder);
+		}else{
+			holder = (ViewHolder) convertView.getTag();
+		}
+		holder.image.setBackgroundResource(((DownloadItem) mData.get(position)).getImageId());
+		holder.name.setText(((DownloadItem) mData.get(position)).getName());
+//		holder.button.setOnClickListener(new BtnListener(position));
+
+		return convertView;
+		
+	}
+	
+	private class BtnListener implements OnClickListener{
+		private int mPosition;
+		private MyAsynctask mTask;
+		private String mUrlStr;
+		private String mFileName;
+
+		public BtnListener(int position){		
+			this.mPosition = position;
+		}
+		@Override
+		public void onClick(View v) {
+			
+			DownloadItem item = (DownloadItem) mData.get(mPosition);
+			Log.i("test", item.getName());
+			mUrlStr = item.getUrlStr();
+			mFileName = item.getName();
+			ViewHolder holder = mHolders.get(mPosition);
+						
+			if(item.getState() == DownloadItem.State.UNSTART){	
+				mTask = new MyAsynctask(mContext, holder, 1, DownloadAdapter.this, item);
+				mTask.executeOnExecutor(Executors.newCachedThreadPool(), mUrlStr, mFileName);				
+				holder.button.setText("暂停");
+			}else if(item.getState() == DownloadItem.State.BUSY){
+				mTask.setFlag(false);
+				mTask = null;
+				holder.button.setText("继续");
+			}else if(item.getState() == DownloadItem.State.PAUSE){
+				holder.button.setText("暂停");
+				mTask = new MyAsynctask(mContext, holder, 1, DownloadAdapter.this, item);	
+				mTask.executeOnExecutor(Executors.newCachedThreadPool(),mUrlStr ,mFileName);
+			}else if(item.getState() == DownloadItem.State.OVER){
+				holder.button.setText("完成");
+			}
+		}
+	}
+
+	
+	public List<ViewHolder> getHolders(){
+		return mHolders;
+	}
+}

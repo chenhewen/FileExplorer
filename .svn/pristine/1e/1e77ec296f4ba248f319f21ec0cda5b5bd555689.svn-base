@@ -1,0 +1,49 @@
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+   	xmlns:tools="http://schemas.android.com/tools"
+   	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+    >
+    <LinearLayout 
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical">
+		<RelativeLayout   
+		   	android:id="@+id/download_list_item"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:padding="10dp">
+		    <ImageView 
+		        android:id="@+id/download_fileicon"
+		        android:layout_width="50dp"
+		    	android:layout_height="50dp"
+		        />
+		   	<TextView 
+		   	    android:id="@+id/download_filename"
+		   	    android:layout_toRightOf="@id/download_fileicon"
+				android:layout_marginLeft="10dp"
+		   	    android:layout_gravity="center_vertical"
+		        android:layout_width="wrap_content"
+		       	android:layout_height="wrap_content"
+		       	android:minWidth="200dp"
+		       	android:layout_centerVertical="true"
+		   	    />
+		   	<Button 
+		        android:id="@+id/download_btn"
+		        android:text="下载"
+		        android:layout_toRightOf="@id/download_filename"
+
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+	       />
+	   </RelativeLayout>
+	   <ProgressBar 
+	       android:id="@+id/download_bar"
+	       style="?android:attr/progressBarStyleHorizontal" 
+	       android:layout_width="match_parent"
+	       android:layout_height="wrap_content"
+	       />
+	</LinearLayout>
+	   
+</RelativeLayout>

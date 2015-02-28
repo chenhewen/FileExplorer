@@ -1,0 +1,120 @@
+package com.chen_hewen.fileexplorer;
+
+import java.io.File;
+
+import android.os.Environment;
+
+public class FileHelper {
+	
+	private String mSDPath;
+	private String mFileName;
+	private String mCurPath;
+	
+	
+
+	/*********************************************路径相关的辅助类*********************************************/
+
+	public String withSlashBefore(String str){
+		return "/" + str;
+	}
+	
+	//获取当前路径
+	public String getCurPath(){
+		return mCurPath;
+	}
+	
+	//初始化SD卡路径的值，当前路径的值
+
+	//如果第一次启动程序，将根目录赋值给mCurPath
+	//如果不是第一次，那么从文件里读出上一次退出的路径，赋值给mCurPath
+	
+	//先实现从根路径进入,也就是每次启动应用mCurPath的值为根路径的值
+	public void initCurPath(){
+		if(mCurPath == null){
+			mCurPath = mSDPath== null ? getSDCardRootPath() : mSDPath;
+		}		
+	}
+	
+	
+	//同步文件路径
+	public String correctCurPath(){
+		mCurPath = mCurPath.substring(0, mCurPath.lastIndexOf("/"));
+		return mCurPath;
+	}
+	
+	//同步文件路径
+	public String correctCurPath(String path){
+		
+			
+		mCurPath += withSlashBefore(path);
+		return mCurPath;
+	}
+	
+	//连接文件路径，但是不改变当前路径
+	public String joinCurPath(String path){
+		return mCurPath + withSlashBefore(path);
+	}
+	
+	
+	
+	/*********************************************SD卡相关类*********************************************/
+	
+	//判断SD卡是否存在
+	public boolean isSDCardExist(){
+		return Environment.getExternalStorageState()
+				.equals(Environment.MEDIA_MOUNTED);
+	} 
+	
+	//获取SD卡根路径
+	public String getSDCardRootPath(){
+		if(!isSDCardExist()){
+			return null;
+		}
+		mSDPath = Environment.getExternalStorageDirectory().toString();
+			
+		return mSDPath;
+	}
+	
+	
+	
+	/*********************************************获取文件夹目录结构*********************************************/
+	
+	//获取指定路径下的文件夹和文件
+	public File[] getDirsAndFiles(String path){
+		File file = new File(path);
+		File[] files =  file.listFiles();
+		return files;
+	}
+	
+	//进入文件，同时更新当前路径！
+	public File[] openDir(String path){
+		initCurPath();
+		correctCurPath(path);
+		return getDirsAndFiles(mCurPath);
+	}
+	
+	//返回父目录，同时更新当前路径！
+	public File[] backToParentDir(){
+		correctCurPath();
+		return getDirsAndFiles(mCurPath);
+	}
+	
+	
+	
+	
+	/*********************************************创建文件夹*********************************************/
+	
+	//在指定路径新建文件夹
+	public boolean createDir(String path){
+		File file = new File(path);
+		if(file.isDirectory()){
+			return false;
+		}
+		return file.mkdir();
+	}
+	
+	//在当前路径创建指定文件夹
+	public boolean createDirInCurPath(String path){
+		return createDir(joinCurPath(path));
+	}	
+}

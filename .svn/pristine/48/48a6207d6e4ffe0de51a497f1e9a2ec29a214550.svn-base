@@ -1,0 +1,49 @@
+package com.chen_hewen.fileexplorer;
+
+import java.io.File;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends Activity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		
+		FileHelper fh = new FileHelper();
+		String root = fh.getSDCardRootPath();
+		//Log.i("test", root);
+		
+		/*File[] files = fh.getDirAndFile(root);
+		for(File file: files){
+			Log.i("test", file.getName().toString());
+		}*/
+		
+		/*boolean flag = fh.createDir(root+"/xyz");
+		Log.i("test", flag+"");*/
+		
+		/*fh.openDir("CHW");
+		Log.i("test", fh.getCurrentPath());
+		File[] files = fh.getDirsAndFiles(fh.getCurrentPath());
+		for(File file: files){
+			Log.i("test", "----"+file.getName().toString());
+		}*/
+		
+		fh.openDir("CHW");
+		fh.createDirInCurPath("abc");
+		fh.openDir("abc");
+		fh.createDirInCurPath("def");
+		File[] files = fh.getDirsAndFiles(fh.getCurPath());
+		for(File file: files){
+			Log.i("test", "----"+file.getName().toString());
+		}
+		
+		//fh.createDirInCurPath("abc");
+		
+		/*String str = "mnt/sdcard/chw/new/xyz".substring(0, "mnt/sdcard/chw/new/xyz".lastIndexOf("/"));
+		Log.i("test", str);*/
+	}
+}

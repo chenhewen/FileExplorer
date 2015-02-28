@@ -1,0 +1,102 @@
+package com.chen_hewen.fileexplorer;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+	
+	
+	FileHelper mFileHelper;
+	List mData;
+	SimpleAdapter mAdapter;
+	
+	ListView listView;
+	Button rootbtn;
+	Button upbtn;
+	TextView pathtxt;
+	
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		
+		listView = (ListView) findViewById(R.id.filelist);
+		pathtxt = (TextView) findViewById(R.id.pathtxt);
+		rootbtn = (Button) findViewById(R.id.rootbtn);
+		upbtn = (Button) findViewById(R.id.upbtn);
+		
+		mFileHelper = new FileHelper();
+		File[] files = mFileHelper.openRootDirAndReturnFiles();//openDirAndReturnFiles(mFileHelper.getSDCardRootPath());
+
+		goInto(files);
+		
+		mAdapter = new SimpleAdapter(this, mData, R.layout.list_item, new String[]{"image", "name"}, new int[]{R.id.fileicon, R.id.filename});
+		listView.setAdapter(mAdapter);
+		initListener();
+	}
+	
+	public void refreshPathTxt(){
+		pathtxt.setText(mFileHelper.getCurPath());
+	}
+	
+	public void goInto(File[] files){
+		mData = new ArrayList<Map<String, Object>>();
+		for(File f: files){
+			Map map = new HashMap<String, Object>();
+			map.put("image", R.drawable.ic_launcher);
+			map.put("name", f.getName());
+			mData.add(map);
+		}
+		mAdapter = new SimpleAdapter(this, mData, R.layout.list_item, new String[]{"image", "name"}, new int[]{R.id.fileicon, R.id.filename});
+		listView.setAdapter(mAdapter);
+		refreshPathTxt();
+	}
+	
+	public void initListener(){
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position,
+					long id) {
+				Map map = (Map) listView.getItemAtPosition(position);
+				String fileName = (String) map.get("name");
+				File[] files = mFileHelper.openDirAndReturnFiles(fileName);
+				goInto(files);
+			}
+		});
+		
+		upbtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				File[] files = mFileHelper.backToParentDirAndReturnFiles();
+				if(files == null){
+					return;
+				}
+				goInto(files);
+				
+			}
+		});
+		
+		rootbtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				File[] files = mFileHelper.openRootDirAndReturnFiles();
+				goInto(files);
+			}
+		});
+	}
+}
